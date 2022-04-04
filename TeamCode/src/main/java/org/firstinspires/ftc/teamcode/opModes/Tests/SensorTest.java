@@ -16,20 +16,30 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcontroller.external.samples.SensorDIO;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Robot21;
+import org.firstinspires.ftc.teamcode.misc.AmperkaProximitySensor;
 
 @Config
 @TeleOp(group = "Sensor")
 public class SensorTest extends LinearOpMode {
     private AnalogInput input;
     private AnalogInput backline, midline;
+    private AmperkaProximitySensor distanceSensor;
 //    public static double midvalue = 0.35;
     public static double backvalue = 0.35;
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         Robot21 R = new Robot21();
         R.attachGamepads(gamepad1, gamepad2);
         R.init(this);
+//        distanceSensor = hardwareMap.get(AmperkaProximitySensor.class, "distance_sensor");
+//        distanceSensor.addTelemetry(telemetry);
+//        distanceSensor.initialize();
+//        while (distanceSensor.init()) {
+//            telemetry.addData("Distance sensor init error!", null);
+//            telemetry.update();
+//        }
+////        distanceSensor.setDefaultSettings();
 //        input = hardwareMap.get(AnalogInput.class, "sensor_range");
 //        backline = hardwareMap.get(AnalogInput.class, LINE_SENSOR_BACK);
 //        midline = hardwareMap.get(AnalogInput.class, LINE_SENSOR_MID);
@@ -39,7 +49,8 @@ public class SensorTest extends LinearOpMode {
         ElapsedTime t = new ElapsedTime();
         while(opModeIsActive()) {
             R.control(false, t.milliseconds());
-            R.intake.update();
+//            R.intake.update();
+//            telemetry.addData("Distance in mm", distanceSensor.getDistance());
 //            telemetry.addData("Voltage: ", input.getVoltage());
             telemetry.addData("isFull", R.intake.isFull());
 //            telemetry.addData("isLineMid", midline.getVoltage() < midvalue);

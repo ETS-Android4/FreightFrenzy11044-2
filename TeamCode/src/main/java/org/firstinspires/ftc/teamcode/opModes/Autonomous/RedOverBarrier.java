@@ -174,7 +174,7 @@ public class RedOverBarrier extends LinearOpMode {
                 R.intake.autoOutAsync();
         }
         t = new ElapsedTime();
-        while (t.milliseconds() < 200)
+        while (t.milliseconds() < 500)
             R.intake.motor.setPowerClassic(intakePwr);
         R.intake.motor.setPowerClassic(0);
 
@@ -192,12 +192,12 @@ public class RedOverBarrier extends LinearOpMode {
             R.lift.update(0);
         R.intake.update();
         while (!isStopRequested() && !R.intake.isFull) {
-            R.drivetrainTank.setPowerSimple(0.4, 0.4);
+            R.drivetrainTank.setPowerSimple(0.7, 0.7);
             while (!isStopRequested() && Math.abs(R.imu.getTiltHeading()) > 3 && !R.intake.isFull()) {
                 R.drivetrainTank.setPowerSimple(-0.8, -0.8);
                 R.intake.update();
             }
-            R.intake.autoInAsync(0.4);
+            R.intake.autoInAsync(0.8);
             R.lift.update(0);
             R.localizer.update();
             deltaleft = Localizer.encoderTicksToInches(Math.abs(R.drivetrainTank.lf.getCurrentPosition() - begleft));
@@ -208,14 +208,14 @@ public class RedOverBarrier extends LinearOpMode {
         }
         R.drivetrainTank.setPowerSimple(0,0);
         R.intake.setPower(0);
-        tracker.forwardlift(dist, -0.6);
+        tracker.forwardlift(dist, -1);
         tracker.rotateTo(0);
         tracker.forwardlift(36, -0.8);
         tracker.rotateTo(new Vector2d(24, -12));
         t = new ElapsedTime();
         while (t.milliseconds() < 500)
             R.lift.update(high_pos);
-        tracker.forward(5, 0.5);
+        tracker.forward(2, 0.5);
         R.intake.update();
         while (R.intake.isFull() && t.milliseconds() < 2000 && !isStopRequested()) {
             R.lift.update(high_pos);
@@ -225,7 +225,7 @@ public class RedOverBarrier extends LinearOpMode {
         while (t.milliseconds() < 200)
             R.intake.motor.setPowerClassic(intakePwr);
         R.intake.motor.setPowerClassic(0);
-        tracker.forward(5, -0.8);
+        tracker.forward(6, -0.8);
 
         t = new ElapsedTime();
         while (t.milliseconds() < 500)
@@ -241,11 +241,12 @@ public class RedOverBarrier extends LinearOpMode {
         R.intake.setPower(-0.8);
         R.intake.update();
         while (!isStopRequested() && !R.intake.isFull) {
-//            double velocity = Localizer.encoderTicksToInches((R.drivetrainTank.lf.getVelocity() + R.drivetrainTank.lf.getVelocity()) / 2);
-            R.drivetrainTank.setPowerSimple(0.4, 0.4);
-            while (!isStopRequested() && Math.abs(R.imu.getTiltHeading()) > 3 && !R.intake.isFull()) {
+            double velocity = Math.abs(Localizer.encoderTicksToInches((R.drivetrainTank.lf.getVelocity() + R.drivetrainTank.lf.getVelocity()) / 2));
+            R.drivetrainTank.setPowerSimple(0.7, 0.7);
+            while (!isStopRequested() && Math.abs(R.imu.getTiltHeading()) > 3 && !R.intake.isFull() && velocity < 1) {
                 R.drivetrainTank.setPowerSimple(-0.8, -0.8);
                 R.intake.update();
+                velocity = Math.abs(Localizer.encoderTicksToInches((R.drivetrainTank.lf.getVelocity() + R.drivetrainTank.lf.getVelocity()) / 2));
             }
 //            if (velocity < 5) {
 //                t = new ElapsedTime();
@@ -254,7 +255,7 @@ public class RedOverBarrier extends LinearOpMode {
 //                R.drivetrainTank.setPowerSimple(0,0);
 //                tracker.rotateTo(Math.toDegrees(R.imu.getImu1Heading()) + 5);
 //            }
-            R.intake.autoInAsync(0.4);
+            R.intake.autoInAsync(0.8);
             R.lift.update(0);
             R.localizer.update();
             deltaleft = Localizer.encoderTicksToInches(Math.abs(R.drivetrainTank.lf.getCurrentPosition() - begleft));
@@ -265,14 +266,14 @@ public class RedOverBarrier extends LinearOpMode {
         }
         R.drivetrainTank.setPowerSimple(0,0);
         R.intake.setPower(0);
-        tracker.forwardlift(dist, -0.6);
+        tracker.forwardlift(dist, -1);
         tracker.rotateTo(0);
         tracker.forwardlift(36, -0.8);
         tracker.rotateTo(new Vector2d(24, -12));
         t = new ElapsedTime();
         while (t.milliseconds() < 500)
             R.lift.update(high_pos);
-        tracker.forward(5, 0.5);
+        tracker.forward(2, 0.5);
         R.intake.update();
         while (R.intake.isFull() && t.milliseconds() < 2000 && !isStopRequested()) {
             R.lift.update(high_pos);
@@ -282,7 +283,7 @@ public class RedOverBarrier extends LinearOpMode {
         while (t.milliseconds() < 200)
             R.intake.motor.setPowerClassic(intakePwr);
         R.intake.motor.setPowerClassic(0);
-        tracker.forward(5, -0.8);
+        tracker.forward(6, -0.8);
 
         tracker.rotateTo(0);
         tracker.forwardlift(48, 1);

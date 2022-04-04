@@ -122,7 +122,7 @@ public class Intake extends RobotPart{
     public void update() {
         averageVoltage = 0;
 //
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 10; i++) {
             if (!input.getState())
                 averageVoltage++;
             else

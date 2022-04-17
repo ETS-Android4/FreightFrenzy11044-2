@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opModes.Autonomous;
 
 import static org.firstinspires.ftc.teamcode.modules.Intake.intakePwr;
 import static org.firstinspires.ftc.teamcode.modules.Lift.high_pos;
+import static org.firstinspires.ftc.teamcode.modules.Lift.initialkF;
 import static org.firstinspires.ftc.teamcode.modules.Lift.low_pos;
 import static org.firstinspires.ftc.teamcode.modules.Lift.mid_pos;
 
@@ -36,7 +37,7 @@ import java.util.List;
 
 @Config
 @Autonomous
-public class RedOverBarrier extends LinearOpMode {
+public class BlueOverBarrierCorrected extends LinearOpMode { //mirrored
     public static double lookaheadDistance = 4;
     private static final int CAMERA_WIDTH = 320; // width  of wanted camera resolution
     private static final int CAMERA_HEIGHT = 240; // height of wanted camera resolution
@@ -60,27 +61,39 @@ public class RedOverBarrier extends LinearOpMode {
         ElapsedTime t;
         Robot21 R = new Robot21();
 
-        Path tohub1 = new Path(true);
-//        Path back1 = new Path(false);
+        Path toHubStarter = new Path(true);
+        Path toWarehouse = new Path(true);
+        Path intake = new Path(true);
+        Path back = new Path(false);
+        Path toHub = new Path(false);
 
-        tohub1.generatePath(hardwareMap, org.firstinspires.ftc.teamcode.R.raw.redob);
-//        back1.generatePath(hardwareMap, org.firstinspires.ftc.teamcode.R.raw.redob1);
+        toHubStarter.generatePath(hardwareMap, org.firstinspires.ftc.teamcode.R.raw.blueob0);
+        toWarehouse.generatePath(hardwareMap, org.firstinspires.ftc.teamcode.R.raw.blueob1);
+        intake.generatePath(hardwareMap, org.firstinspires.ftc.teamcode.R.raw.blueob2);
+        back.generatePath(hardwareMap, org.firstinspires.ftc.teamcode.R.raw.blueob3);
+        toHub.generatePath(hardwareMap, org.firstinspires.ftc.teamcode.R.raw.blueob4);
 
-        tohub1.initializePath(25, 25, 10, 4);
-//        back1.initializePath(25, 25, 10, 4);
+        toHubStarter.initializePath(40, 40, 5, 4);
+        toWarehouse.initializePath(50, 60, 5, 8);
+        intake.initializePath(30, 30, 20, 8);
+        back.initializePath(40, 40, 20, 8);
+        toHub.initializePath(40, 40, 5, 8);
 
         List<Path> paths = new ArrayList<>();
-        paths.add(tohub1);
-//        paths.add(back1);
+        paths.add(toHubStarter);
+        paths.add(toWarehouse);
+        paths.add(intake);
+        paths.add(back);
+        paths.add(toHub);
 
         R.init(this);
 
         PurePursuitTracker tracker = new PurePursuitTracker(R, this);
-        tracker.setRobotTrack(17);
+        tracker.setRobotTrack(19);
         tracker.setPaths(paths, lookaheadDistance);
         tracker.setPath(0);
 
-        R.localizer.setStartPose(new Pose2d(66, 12, Math.toRadians(90)));
+        R.localizer.setStartPose(new Pose2d(-66, 12, Math.toRadians(-90)));
 
         TeamElementDetectionPipeline.Position position = TeamElementDetectionPipeline.Position.RIGHT;
 
@@ -102,7 +115,7 @@ public class RedOverBarrier extends LinearOpMode {
                     .createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
         }
 
-        camera.setPipeline(pipeline = new TeamElementDetectionPipeline(telemetry, DEBUG, true, this));
+        camera.setPipeline(pipeline = new TeamElementDetectionPipeline(telemetry, DEBUG, false, this));
 
         TeamElementDetectionPipeline.CAMERA_WIDTH = CAMERA_WIDTH;
 
@@ -157,8 +170,8 @@ public class RedOverBarrier extends LinearOpMode {
         }
         R.drivetrainTank.setPowerSimple(0,0);
         R.lift.setPower(0);
-        tracker.rotateTo(new Vector2d(24, -14));
-        tracker.forward(1, 1); ///firstchange
+        tracker.rotateTo(new Vector2d(-24, -12));
+        tracker.forward(1, 0.8);
         t = new ElapsedTime();
         R.intake.update();
         while (R.intake.isFull() && t.milliseconds() < 2000 && !isStopRequested()) {
@@ -176,119 +189,172 @@ public class RedOverBarrier extends LinearOpMode {
         t = new ElapsedTime();
         while (t.milliseconds() < 500)
             R.intake.motor.setPowerClassic(intakePwr);
+        while (R.intake.isFull())
+            R.intake.motor.setPowerClassic(1);
         R.intake.motor.setPowerClassic(0);
 
-        tracker.forward(6, -1);
+        tracker.forward(1, -0.8);
         t = new ElapsedTime();
-        while (t.milliseconds() < 500)
-            R.lift.update(low_pos);
-        tracker.rotateTo(0);
+//        while (t.milliseconds() < 500)
+//            R.lift.update(low_pos);
+        tracker.rotateTo(5, low_pos - 200);
 
-        tracker.forwardlift(36, 1);
-        tracker.rotateTo(-30);
-        begleft = R.drivetrainTank.lf.getCurrentPosition();
-        begright = R.drivetrainTank.rf.getCurrentPosition();
-        while (t.milliseconds() < 1000)
-            R.lift.update(0);
-        R.intake.update();
-        while (!isStopRequested() && !R.intake.isFull) {
-            double velocity = Math.abs(Localizer.encoderTicksToInches((R.drivetrainTank.lf.getVelocity() + R.drivetrainTank.lf.getVelocity()) / 2));
-            R.drivetrainTank.setPowerSimple(0.7, 0.7);
-            while (!isStopRequested() && Math.abs(R.imu.getTiltHeading()) > 3 && !R.intake.isFull() && velocity < 5) {
-                R.drivetrainTank.setPowerSimple(-0.8, -0.8);
-                R.intake.update();
-                velocity = Math.abs(Localizer.encoderTicksToInches((R.drivetrainTank.lf.getVelocity() + R.drivetrainTank.lf.getVelocity()) / 2));
-            }
-            R.intake.autoInAsync(0.8);
-            R.lift.update(0);
-            R.localizer.update();
-            deltaleft = Localizer.encoderTicksToInches(Math.abs(R.drivetrainTank.lf.getCurrentPosition() - begleft));
-            deltaright = Localizer.encoderTicksToInches(Math.abs(R.drivetrainTank.rf.getCurrentPosition() - begright));
-            dist = (deltaleft + deltaright) / 2;
-            telemetry.addData("dist", dist);
-            telemetry.update();
+        tracker.setPath(1);
+        t = new ElapsedTime();
+        while (!tracker.isDone() && !isStopRequested()) {
+            DrivePower drivePower = tracker.update(t.milliseconds() / 1000.0);
+            R.drivetrainTank.setPower(drivePower);
+            R.lift.update(low_pos - 200);
         }
         R.drivetrainTank.setPowerSimple(0,0);
-        R.intake.setPower(0);
-        tracker.forwardlift(dist, -1);
-        tracker.rotateTo(0);
-        tracker.forwardlift(36, -1);
-        tracker.rotateTo(new Vector2d(24, -15));
+        R.lift.setPower(0);
+
+        tracker.rotateTo(30);
+
+        tracker.setPath(2);
         t = new ElapsedTime();
-        while (t.milliseconds() < 500)
-            R.lift.update(high_pos);
-        tracker.forward(6, 1);
-        R.intake.update();
-        while (R.intake.isFull() && t.milliseconds() < 2000 && !isStopRequested()) {
+        while (!tracker.isDone() && !R.intake.isFull() && !isStopRequested()) {
+            DrivePower drivePower = tracker.update(t.milliseconds() / 1000.0, true);
+            if (Math.abs(R.imu.getTiltHeading()) > 3)
+                tracker.forward(5, -0.7, true);
+            else
+                R.drivetrainTank.setPower(drivePower);
+            R.lift.update(0);
+            R.intake.autoInAsync(0.8);
+        }
+        R.drivetrainTank.setPowerSimple(0,0);
+        R.lift.setPower(0);
+        R.intake.setPower(0);
+
+        tracker.setPath(3);
+        t = new ElapsedTime();
+        while (!tracker.isDone() && !isStopRequested()) {
+            DrivePower drivePower = tracker.update(t.milliseconds() / 1000.0);
+            R.drivetrainTank.setPower(drivePower);
+            R.lift.update(low_pos);
+        }
+        R.drivetrainTank.setPowerSimple(0,0);
+        R.lift.setPower(0);
+
+        tracker.rotateTo(0);
+
+        tracker.setPath(4);
+        t = new ElapsedTime();
+        while (!tracker.isDone() && !isStopRequested()) {
+            DrivePower drivePower = tracker.update(t.milliseconds() / 1000.0);
+            R.drivetrainTank.setPower(drivePower);
+            R.lift.update(low_pos - 200);
+        }
+        R.drivetrainTank.setPowerSimple(0,0);
+        R.lift.setPower(0);
+
+//        t = new ElapsedTime();
+//        while (t.milliseconds() < 500)
+//            R.lift.update(high_pos);
+//        R.lift.setPower(initialkF);
+        tracker.rotateTo(new Vector2d(-24, -12), high_pos);
+        R.lift.setPower(initialkF);
+
+        tracker.forward(4, 0.8);
+        while (R.intake.isFull() && t.milliseconds() < 3000 && !isStopRequested()) {
             R.lift.update(high_pos);
             R.intake.autoOutAsync(0.5);
         }
         t = new ElapsedTime();
-        while (t.milliseconds() < 200)
-            R.intake.motor.setPowerClassic(intakePwr);
+        while (t.milliseconds() < 800)
+            R.intake.motor.setPowerClassic(1);
+        while (R.intake.isFull())
+            R.intake.motor.setPowerClassic(1);
         R.intake.motor.setPowerClassic(0);
-        tracker.forward(6, -1);
+        tracker.forward(4, -0.8);
+        R.delay(300);
 
+        tracker.rotateTo(5, low_pos - 200);
+//        t = new ElapsedTime();
+//        while (t.milliseconds() < 500)
+//            R.lift.update(low_pos);
+
+        tracker.setPath(1);
         t = new ElapsedTime();
-        while (t.milliseconds() < 500)
-            R.lift.update(low_pos);
-        tracker.rotateTo(0);
-
-        tracker.forwardlift(36, 1);
-        tracker.rotateTo(-30);
-        begleft = R.drivetrainTank.lf.getCurrentPosition();
-        begright = R.drivetrainTank.rf.getCurrentPosition();
-        while (t.milliseconds() < 1000)
-            R.lift.update(0);
-        R.intake.setPower(-0.8);
-        R.intake.update();
-        while (!isStopRequested() && !R.intake.isFull) {
-            double velocity = Math.abs(Localizer.encoderTicksToInches((R.drivetrainTank.lf.getVelocity() + R.drivetrainTank.lf.getVelocity()) / 2));
-            R.drivetrainTank.setPowerSimple(0.7, 0.7);
-            while (!isStopRequested() && Math.abs(R.imu.getTiltHeading()) > 3 && !R.intake.isFull() && velocity < 5) {
-                R.drivetrainTank.setPowerSimple(-0.8, -0.8);
-                R.intake.update();
-                velocity = Math.abs(Localizer.encoderTicksToInches((R.drivetrainTank.lf.getVelocity() + R.drivetrainTank.lf.getVelocity()) / 2));
-            }
-//            if (velocity < 5) {
-//                t = new ElapsedTime();
-//                while (t.milliseconds() < 1000)
-//                    R.drivetrainTank.setPowerSimple(-0.8, -0.8);
-//                R.drivetrainTank.setPowerSimple(0,0);
-//                tracker.rotateTo(Math.toDegrees(R.imu.getImu1Heading()) + 5);
-//            }
-            R.intake.autoInAsync(0.8);
-            R.lift.update(0);
-            R.localizer.update();
-            deltaleft = Localizer.encoderTicksToInches(Math.abs(R.drivetrainTank.lf.getCurrentPosition() - begleft));
-            deltaright = Localizer.encoderTicksToInches(Math.abs(R.drivetrainTank.rf.getCurrentPosition() - begright));
-            dist = (deltaleft + deltaright) / 2;
-            telemetry.addData("dist", dist);
-            telemetry.update();
+        while (!tracker.isDone() && !isStopRequested()) {
+            DrivePower drivePower = tracker.update(t.milliseconds() / 1000.0);
+            R.drivetrainTank.setPower(drivePower);
+            R.lift.update(low_pos - 200);
         }
         R.drivetrainTank.setPowerSimple(0,0);
-        R.intake.setPower(0);
-        tracker.forwardlift(dist, -1);
-        tracker.rotateTo(0);
-        tracker.forwardlift(36, -1);
-        tracker.rotateTo(new Vector2d(24, -15));
+        R.lift.setPower(0);
+
+        tracker.rotateTo(30);
+
+        tracker.setPath(2);
         t = new ElapsedTime();
-        while (t.milliseconds() < 500)
-            R.lift.update(high_pos);
-        tracker.forward(6, 1);
-        R.intake.update();
-        while (R.intake.isFull() && t.milliseconds() < 2000 && !isStopRequested()) {
+        while (!tracker.isDone() && !R.intake.isFull() && !isStopRequested()) {
+            DrivePower drivePower = tracker.update(t.milliseconds() / 1000.0, true);
+            if (Math.abs(R.imu.getTiltHeading()) > 3)
+                tracker.forward(5, -0.7, true);
+            else
+                R.drivetrainTank.setPower(drivePower);
+            R.lift.update(0);
+            R.intake.autoInAsync(0.8);
+        }
+        R.drivetrainTank.setPowerSimple(0,0);
+        R.lift.setPower(0);
+        R.intake.setPower(0);
+
+        tracker.setPath(3);
+        t = new ElapsedTime();
+        while (!tracker.isDone() && !isStopRequested()) {
+            DrivePower drivePower = tracker.update(t.milliseconds() / 1000.0);
+            R.drivetrainTank.setPower(drivePower);
+            R.lift.update(low_pos);
+        }
+        R.drivetrainTank.setPowerSimple(0,0);
+        R.lift.setPower(0);
+
+        tracker.rotateTo(0);
+
+        tracker.setPath(4);
+        t = new ElapsedTime();
+        while (!tracker.isDone() && !isStopRequested()) {
+            DrivePower drivePower = tracker.update(t.milliseconds() / 1000.0);
+            R.drivetrainTank.setPower(drivePower);
+            R.lift.update(low_pos - 200);
+        }
+        R.drivetrainTank.setPowerSimple(0,0);
+        R.lift.setPower(0);
+
+//        t = new ElapsedTime();
+//        while (t.milliseconds() < 500)
+//            R.lift.update(high_pos);
+        tracker.rotateTo(new Vector2d(-24, -13), high_pos);
+        R.lift.setPower(initialkF);
+
+        tracker.forward(4, 0.8);
+        while (R.intake.isFull() && t.milliseconds() < 3000 && !isStopRequested()) {
             R.lift.update(high_pos);
             R.intake.autoOutAsync(0.5);
         }
         t = new ElapsedTime();
-        while (t.milliseconds() < 200)
-            R.intake.motor.setPowerClassic(intakePwr);
+        while (t.milliseconds() < 800)
+            R.intake.motor.setPowerClassic(1);
+        while (R.intake.isFull())
+            R.intake.motor.setPowerClassic(1);
         R.intake.motor.setPowerClassic(0);
-        tracker.forward(6, -1);
+        tracker.forward(4, -0.8);
+        R.delay(300);
 
-        tracker.rotateTo(0);
-        tracker.forwardlift(48, 1);
+        tracker.rotateTo(5, low_pos - 200);
+
+        tracker.setPath(1);
+        t = new ElapsedTime();
+        while (!tracker.isDone() && !R.intake.isFull() && !isStopRequested()) {
+            DrivePower drivePower = tracker.update(t.milliseconds() / 1000.0);
+            R.drivetrainTank.setPower(drivePower);
+            R.lift.update(low_pos - 200);
+        }
+        R.drivetrainTank.setPowerSimple(0,0);
+        R.lift.setPower(0);
+
         t = new ElapsedTime();
         while (!isStopRequested() && t.milliseconds() < 3000)
             R.lift.update(100);

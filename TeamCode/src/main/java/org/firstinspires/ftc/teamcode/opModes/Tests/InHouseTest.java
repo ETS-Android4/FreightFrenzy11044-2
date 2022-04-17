@@ -45,7 +45,7 @@ public class InHouseTest extends LinearOpMode {
 
         R.init(this);
 
-        PurePursuitTracker tracker = new PurePursuitTracker(R.drivetrainTank, R.localizer, this, R.lift, R.imu);
+        PurePursuitTracker tracker = new PurePursuitTracker(R, this);
 
         waitForStart();
 

@@ -21,8 +21,8 @@ import java.util.List;
 
 @Config
 public class Localizer extends TankLocalizer {
-    public static double TICKS_PER_REV = 751.8;
-    private static double WHEEL_RADIUS = 1.37; // in
+    public static double TICKS_PER_REV = 560; //751.8;
+    private static double WHEEL_RADIUS = 1.65; // in
     private static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
 
@@ -35,7 +35,7 @@ public class Localizer extends TankLocalizer {
     private LinearOpMode opMode;
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
-    private AnalogInput lineSensorBack, lineSensorMid;
+//    private AnalogInput lineSensorBack, lineSensorMid;
 
     public static double backvalue = 0.7;
     public static double midvalue = 0.35;
@@ -52,11 +52,11 @@ public class Localizer extends TankLocalizer {
         leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, LEFT_FRONT_MOTOR));
         rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, RIGHT_FRONT_MOTOR));
 
-        leftEncoder.setDirection(Encoder.Direction.REVERSE);
+        leftEncoder.setDirection(Encoder.Direction.FORWARD);
         rightEncoder.setDirection(Encoder.Direction.FORWARD);
 
 //        lineSensorMid = hardwareMap.get(AnalogInput.class, LINE_SENSOR_MID);
-        lineSensorBack = hardwareMap.get(AnalogInput.class, LINE_SENSOR_BACK);
+//        lineSensorBack = hardwareMap.get(AnalogInput.class, LINE_SENSOR_BACK);
 
 //        lineSensor.setMode(DigitalChannel.Mode.INPUT);
 
@@ -96,13 +96,13 @@ public class Localizer extends TankLocalizer {
         return inches / WHEEL_RADIUS / 2 / Math.PI / GEAR_RATIO * TICKS_PER_REV;
     }
 
-    @Override
-    public boolean isLineBack() {
-        return lineSensorBack.getVoltage() < backvalue;
-    }
-
-    @Override
-    public boolean isLineMiddle() {
-        return lineSensorMid.getVoltage() < midvalue;
-    }
+//    @Override
+//    public boolean isLineBack() {
+//        return lineSensorBack.getVoltage() < backvalue;
+//    }
+//
+//    @Override
+//    public boolean isLineMiddle() {
+//        return lineSensorMid.getVoltage() < midvalue;
+//    }
 }

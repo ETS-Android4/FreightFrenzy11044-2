@@ -17,7 +17,7 @@ public class TrackWidthTuner extends LinearOpMode {
         double effectiveTrackWidth = 0;
         double leftPos, rightPos;
         while (Math.abs(R.localizer.getHeading()) < Math.toRadians(170) && !isStopRequested()) {
-            R.drivetrainTank.setPowerSimple(-0.5, 0.5);
+            R.drivetrainTank.setPowerSimple(-0.8, 0.8);
             leftPos = Math.abs(Localizer.encoderTicksToInches(R.drivetrainTank.lf.getCurrentPosition()));
             rightPos = Math.abs(Localizer.encoderTicksToInches(R.drivetrainTank.rf.getCurrentPosition()));
             if (R.localizer.getHeading() != 0)

@@ -18,7 +18,8 @@ import java.util.List;
 @Config
 public class Lift extends RobotPart {
     public static double initialkF = 0.29;
-    public static double kSlow = 0.3;
+    public static double kSlow = 0.4;
+    public static double kSlowDown = 0.4;
     public RobotMotor motor;
     public double currentPos = 0;
     public static double offset = 20;
@@ -73,6 +74,8 @@ public class Lift extends RobotPart {
                     }
                 } else {
                     power = Math.signum(-gamepad.right_stick_y) * Math.pow(gamepad.right_stick_y, 50);
+                    if (motor.getCurrentPosition() < mid_pos && gamepad.right_stick_y > 0)
+                        power *= kSlow;
                     motor.setPowerClassic(power + kF);
                 }
             }
@@ -131,7 +134,10 @@ public class Lift extends RobotPart {
 //                    opMode.telemetry.addData("over high", null);
                 }
                 if (motor.getCurrentPosition() <= highLimit && motor.getCurrentPosition() >= lowLimit) {
-                    power = k * Math.signum(-gamepad.right_stick_y) * Math.pow(gamepad.right_stick_y, 2) + kF;
+                    power = k * Math.signum(-gamepad.right_stick_y) * Math.pow(gamepad.right_stick_y, 2);
+                    if (motor.getCurrentPosition() < mid_pos && gamepad.right_stick_y > 0)
+                        power *= kSlowDown;
+                    power += kF;
 //                    opMode.telemetry.addData("ok", null);
                 }
             }

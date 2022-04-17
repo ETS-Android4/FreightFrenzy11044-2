@@ -21,7 +21,7 @@ public class Carousel extends RobotPart{
     private double power = Power;
     public static double baseVoltage = 14;
     private VoltageSensor voltageSensor;
-    public static double reverseTime = 50;
+    public static double reverseTime = 80;
 
     @Override
     public void init(LinearOpMode opMode) {
@@ -64,8 +64,8 @@ public class Carousel extends RobotPart{
                     wasTurning = false;
                 }
                 if (t.milliseconds() < reverseTime) {
-                    motor_left.setPowerClassic(0.2);
-                    motor_right.setPowerClassic(0.2);
+                    motor_left.setPowerClassic(0.3);
+                    motor_right.setPowerClassic(0.3);
                 }
                 else {
                     motor_left.setPower(0);
@@ -91,8 +91,8 @@ public class Carousel extends RobotPart{
                     wasTurning = false;
                 }
                 if (t.milliseconds() < reverseTime) {
-                    motor_left.setPowerClassic(-0.2);
-                    motor_right.setPowerClassic(-0.2);
+                    motor_left.setPowerClassic(-0.3);
+                    motor_right.setPowerClassic(-0.3);
                 }
                 else {
                     motor_left.setPower(0);

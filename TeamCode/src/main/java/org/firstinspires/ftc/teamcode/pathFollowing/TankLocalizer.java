@@ -21,7 +21,7 @@ public abstract class TankLocalizer {
     public double x_pos;
     public double y_pos;
     private List<Double> encoderPos, encoderVelocities;
-    private boolean debug = true;
+    private boolean debug = false;
     public double trajstart_left_encoder_pos, trajstart_right_encoder_pos;
     public Pose2d velocity;
     private double leftVelocity, rightVelocity;
@@ -53,8 +53,8 @@ public abstract class TankLocalizer {
         delta_right_encoder_pos = right_encoder_pos - prev_right_encoder_pos;
         delta_middle_pos = (delta_left_encoder_pos + delta_right_encoder_pos) / 2;
 
-        delta_y = -delta_middle_pos * Math.cos(heading);
-        delta_x = delta_middle_pos * Math.sin(heading);
+        delta_y = delta_middle_pos * Math.cos(heading);
+        delta_x = -delta_middle_pos * Math.sin(heading);
 
 //        if (isLine()) {
 //            x_pos = 68;
@@ -197,11 +197,15 @@ public abstract class TankLocalizer {
         return right_encoder_pos - trajstart_right_encoder_pos;
     }
 
+    public Pose2d getCurrentPose() {
+        return currentPose;
+    }
+
     public abstract List<Double> getOdoPositions();
 
     public abstract List<Double> getOdoVelocities();
 
-    public abstract boolean isLineBack();
-
-    public abstract boolean isLineMiddle();
+//    public abstract boolean isLineBack();
+//
+//    public abstract boolean isLineMiddle();
 }

@@ -11,7 +11,7 @@ public class HardwareConfig {
     public static String EXPANSION_HUB = "Expansion Hub 5";
     public static String INTAKE_MOTOR = "intake";
     public static String CAROUSEL_MOTOR_LEFT = "carousel_left";
-    public static String INTAKE_SENSOR = "sensor_range";
+    public static String INTAKE_SENSOR = "distance_sensor";
     public static String LIFT_MOTOR = "lift";
     public static String CAROUSEL_MOTOR_RIGHT = "carousel_right";
 //    public static String LINE_SENSOR_MID = "line_sensor_mid";

@@ -2,42 +2,67 @@ package org.firstinspires.ftc.teamcode.modules;
 
 import static org.firstinspires.ftc.teamcode.modules.HardwareConfig.INTAKE_SENSOR;
 
+import android.app.Activity;
+import android.graphics.Color;
+import android.view.View;
+
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.SwitchableLight;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.checkerframework.checker.index.qual.LTEqLengthOf;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.misc.RobotMotor;
 
 public class Intake extends RobotPart{
     public RobotMotor motor;
-    private DigitalChannel input;
+    private RevColorSensorV3 distanceSensor;
     public boolean isFull = true;
-    private double averageVoltage = 0;
     public static double intakeMaxTime = 4000;
     public static double intakePwr = 0.9;
-
+    public static double offset = 60;
+    private View relativeLayout;
+    private float gain = 2;
+    final float[] hsvValues = new float[3];
     @Override
     public void init(LinearOpMode opMode) {
         this.opMode = opMode;
+        int relativeLayoutId = opMode.hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", opMode.hardwareMap.appContext.getPackageName());
+        relativeLayout = ((Activity) opMode.hardwareMap.appContext).findViewById(relativeLayoutId);
+
         motor = new RobotMotor(opMode.hardwareMap.get(DcMotorEx.class, HardwareConfig.INTAKE_MOTOR));
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        input = opMode.hardwareMap.get(DigitalChannel.class, INTAKE_SENSOR);
-        input.setMode(DigitalChannel.Mode.INPUT);
+
+        distanceSensor = opMode.hardwareMap.get(RevColorSensorV3.class, INTAKE_SENSOR);
+        if (distanceSensor instanceof SwitchableLight) {
+            ((SwitchableLight)distanceSensor).enableLight(true);
+        }
+        distanceSensor.setGain(gain);
         opMode.telemetry.addData("Intake initialized!", null);
+        opMode.telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
     }
 
     @Override
     public void control(Gamepad gamepad) {
-//        update();
+        update();
         if (Math.abs(gamepad.left_stick_y) >= 0.1) {
-            if (gamepad.left_bumper)
+            if (gamepad.left_bumper) {
                 motor.setPower(-gamepad.left_stick_y * 0.7);
-            else
-                motor.setPower(-gamepad.left_stick_y);
+            }
+            else {
+                if (gamepad.left_stick_y < 0)
+                    motor.setPower(-gamepad.left_stick_y * 0.7);
+                else
+                    motor.setPower(-gamepad.left_stick_y);
+            }
         } else {
             motor.setPower(0);
         }
@@ -120,27 +145,15 @@ public class Intake extends RobotPart{
     }
 
     public void update() {
-        averageVoltage = 0;
-//
-        for (int i = 0; i < 10; i++) {
-            if (!input.getState())
-                averageVoltage++;
-            else
-                averageVoltage--;
+        isFull = distanceSensor.getDistance(DistanceUnit.MM) < offset;
+        opMode.telemetry.addData("distance", distanceSensor.getDistance(DistanceUnit.MM));
+        if (isFull) {
+            opMode.telemetry.addData("<font color='green'>IS FULL</font>", null);
         }
-
-//        if (averageVoltage < 0.45) // for flying fish
-//            isFull = true;
-//        else
-//            isFull = false;
-//        if (!input.getState())
-//            isFull = true;
-//        else
-//            isFull = false;
-        if (averageVoltage > 0)
-            isFull = true;
-        else
-            isFull = false;
+        else {
+            opMode.telemetry.addData("<font color='red'>IS FULL</font>", null);
+        }
+//        opMode.telemetry.update();
     }
 
     public boolean isFull() {

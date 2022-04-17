@@ -35,7 +35,7 @@ public class MaxVelocityTuner extends LinearOpMode {
             prevtime = currenttime;
             if (currentSpeed > maxLinearSpeed)
                 maxLinearSpeed = currentSpeed;
-            currentAcceleration = Math.abs(currentSpeed) / deltatime;
+            currentAcceleration = Math.abs(currentSpeed - prevSpeed) / deltatime;
 //            currentAcceleration = Math.abs(currentSpeed - prevSpeed);
             if (currentAcceleration > maxLinearAcceleration)
                 maxLinearAcceleration = currentAcceleration;

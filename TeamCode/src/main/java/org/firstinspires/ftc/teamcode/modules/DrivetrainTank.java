@@ -61,10 +61,10 @@ public class DrivetrainTank extends RobotPart {
         rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, RIGHT_FRONT_MOTOR));
 
         leftEncoder.setDirection(Encoder.Direction.REVERSE);
-        rightEncoder.setDirection(Encoder.Direction.REVERSE);
+        rightEncoder.setDirection(Encoder.Direction.FORWARD);
 
         lf.setDirection(DcMotorEx.Direction.REVERSE);
-        rf.setDirection(DcMotorEx.Direction.REVERSE);
+        rf.setDirection(DcMotorEx.Direction.FORWARD);
 
         lf.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -151,7 +151,7 @@ public class DrivetrainTank extends RobotPart {
 
     @Override
     public void control(Gamepad gamepad1) {
-        double y = -Math.signum(gamepad1.left_stick_y) * Math.pow(gamepad1.left_stick_y, 2); //-gamepad1.left_stick_y
+        double y = -Math.pow(gamepad1.left_stick_y, 5); //-gamepad1.left_stick_y
         double x = gamepad1.right_trigger - gamepad1.left_trigger;
         x = Math.signum(x) * Math.pow(x, 2);
         if (gamepad1.right_bumper)

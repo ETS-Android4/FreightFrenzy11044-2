@@ -69,7 +69,7 @@ public class RedWarehouse2 extends LinearOpMode {
 
         R.init(this);
 
-        PurePursuitTracker tracker = new PurePursuitTracker(R.drivetrainTank, R.localizer, this, R.lift, R.imu);
+        PurePursuitTracker tracker = new PurePursuitTracker(R, this);
         tracker.setRobotTrack(17);
         tracker.setPaths(paths, lookaheadDistance);
         tracker.setPath(0);
